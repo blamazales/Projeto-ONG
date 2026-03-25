@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Confraria dos Miados e Latidos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Floating Header -->
+        <header class="glass-header">
+            <div class="logo-container">
+                <div class="logo-icon-wrapper">
+                    <i class="fa-solid fa-paw logo-icon"></i>
+                </div>
+                <div>
+                    <h1>Miados & Latidos</h1>
+                    <p class="subtitle">Gestão Interna</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <!-- Estoque View -->
+            <section id="view-stock" class="view active fade-in">
+                <div class="stock-header">
+                    <h2><i class="fa-solid fa-boxes-stacked"></i> Estoque Atual</h2>
+                    <button class="btn btn-primary ripple modal-trigger" onclick="openProductModal()">
+                        <i class="fa-solid fa-plus"></i> Novo Estoque
+                    </button>
+                </div>
+                
+                <div class="table-container glass-card scale-in">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Item / Detalhes</th>
+                                <th>Estoque</th>
+                                <th>Preço (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Histórico de Vendas View -->
+            <section id="view-history" class="view hidden fade-in">
+                <div class="stock-header">
+                    <h2><i class="fa-solid fa-list-check"></i> Registro de Vendas</h2>
+                    <button class="btn btn-success ripple modal-trigger" onclick="openSaleModal()">
+                        <i class="fa-solid fa-plus"></i> Lançar Venda
+                    </button>
+                </div>
+                
+                <div class="table-container glass-card scale-in">
+                    <table class="modern-table" style="margin-top:10px;">
+                        <thead>
+                            <tr>
+                                <th>Data / Venda ID</th>
+                                <th>Valor / Pagto</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-table-body">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Configurações View -->
+            <section id="view-config" class="view hidden fade-in">
+                <div class="stock-header">
+                    <h2><i class="fa-solid fa-gear"></i> Configurações</h2>
+                </div>
+                
+                <div class="glass-card config-card scale-in" style="margin-top:10px;">
+                    <h3>Integração Google Sheets</h3>
+                    <p class="subtitle" style="margin-bottom: 16px;">Cole abaixo a URL do seu App Script para sincronizar os dados na nuvem.</p>
+                    
+                    <div class="form-group">
+                        <label>URL do Web App (Google Script)</label>
+                        <input type="url" id="api-url-input" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                    </div>
+                    
+                    <button id="save-config-btn" class="btn btn-success btn-large ripple" style="margin-top: 16px;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar e Sincronizar
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation Mobile -->
+        <nav class="bottom-nav glass-nav">
+            <a href="#" class="nav-item active ripple-nav" data-target="view-stock">
+                <i class="fa-solid fa-box-open"></i><span>Estoque</span>
+            </a>
+            <a href="#" class="nav-item ripple-nav" data-target="view-history">
+                <i class="fa-solid fa-money-bills"></i><span>Vendas</span>
+            </a>
+            <a href="#" class="nav-item ripple-nav" data-target="view-config">
+                <i class="fa-solid fa-gear"></i><span>Ajustes</span>
+            </a>
+        </nav>
+
+        <!-- Formulário Adicionar Produto -->
+        <div id="product-modal" class="overlay hidden">
+            <div class="modal-center glass-card">
+                <div class="drawer-header" style="padding:16px;">
+                    <h2>Cadastro / Edição de Produto</h2>
+                    <button class="icon-btn close-btn ripple" onclick="closeModal('product-modal')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="drawer-body" style="padding:16px;">
+                    <form id="product-form">
+                        <input type="hidden" id="prod-id">
+                        <div class="form-group">
+                            <label>Nome do Produto (Ex: Ratinho, Camiseta)</label>
+                            <input type="text" id="prod-name" class="form-control" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tamanho</label>
+                                <input type="text" id="prod-size" class="form-control" placeholder="Ex: P, M, G, Único" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Cor / Modelo</label>
+                                <input type="text" id="prod-color" class="form-control" placeholder="Ex: Preta" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Preço Unitário (R$)</label>
+                                <input type="number" id="prod-price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Estoque Atual</label>
+                                <input type="number" id="prod-stock" class="form-control" min="0" required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:8px;">
+                            <label>Link da Imagem (Opcional - Google Drive / Imgur)</label>
+                            <input type="url" id="prod-image" class="form-control" placeholder="https://site.com/foto.jpg">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large" style="margin-top:20px;">Salvar no Estoque</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário Adicionar Venda -->
+        <div id="sale-modal" class="overlay hidden">
+            <div class="modal-center glass-card">
+                <div class="drawer-header" style="padding:16px;">
+                    <h2>Nova Venda</h2>
+                    <button class="icon-btn close-btn ripple" onclick="closeModal('sale-modal')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="drawer-body" style="padding:16px;">
+                    <form id="sale-form">
+                        <div class="form-group">
+                            <label>Qual produto foi vendido?</label>
+                            <select id="sale-product-select" class="form-control" required>
+                                <!-- Dinâmico -->
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Quantidade</label>
+                                <input type="number" id="sale-qty" class="form-control" min="1" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor Venda (Total)</label>
+                                <input type="number" id="sale-total" class="form-control" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:8px;">
+                            <label>Método de Pagamento</label>
+                            <select id="sale-method" class="form-control" required>
+                                <option value="Pix">Pix</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Débito">Débito</option>
+                                <option value="Crédito">Crédito</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-large" style="margin-top:20px;">Registrar e Descontar Estoque</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loading-overlay" class="overlay hidden">
+            <div class="glass-card spinner-card">
+                <div class="spinner"></div>
+                <p id="loading-text">Sincronizando...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
