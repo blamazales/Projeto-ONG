@@ -11,7 +11,6 @@ const mockProducts = [
 
 // Inicia a aplicação
 async function initApp() {
-    setupNavigation();
     setupSettings();
     setupProductForm();
     setupSaleForm();
@@ -23,19 +22,18 @@ async function initApp() {
 }
 
 // Navegação
-function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item[data-target]');
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            navItems.forEach(n => n.classList.remove('active'));
-            item.classList.add('active');
-            
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            document.getElementById(item.getAttribute('data-target')).classList.remove('hidden');
-        });
+window.switchTab = function(targetId, el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.remove('active');
+        v.classList.add('hidden');
     });
-}
+    const target = document.getElementById(targetId);
+    target.classList.add('active');
+    target.classList.remove('hidden');
+};
 
 // Configurações
 function setupSettings() {
@@ -205,9 +203,43 @@ function renderStock(items) {
             </td>
             <td><strong>${p.estoque}</strong> un.</td>
             <td>R$ ${parseFloat(p.preco).toFixed(2).replace('.',',')}</td>
+            <td>
+                <button class="icon-btn" onclick="editProduct('${p.id}')" style="color:var(--primary); font-size: 1rem;"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button class="icon-btn" onclick="deleteProduct('${p.id}')" style="color:var(--danger); font-size: 1rem;"><i class="fa-solid fa-trash"></i></button>
+            </td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+function editProduct(id) {
+    const p = products.find(prod => String(prod.id) === String(id));
+    if(!p) return;
+    document.getElementById('prod-id').value = p.id;
+    document.getElementById('prod-name').value = p.nome;
+    document.getElementById('prod-size').value = p.tamanho;
+    document.getElementById('prod-color').value = p.cor;
+    document.getElementById('prod-price').value = p.preco !== undefined ? p.preco : 0;
+    document.getElementById('prod-stock').value = p.estoque !== undefined ? p.estoque : 0;
+    document.getElementById('prod-image').value = p.foto_url || '';
+    
+    document.getElementById('product-modal').classList.remove('hidden');
+}
+
+async function deleteProduct(id) {
+    if(!confirm("Atenção: Tem certeza que deseja excluir esse produto DEFINITIVAMENTE do estoque?")) return;
+    
+    showLoader(true);
+    // Deleta localmente
+    const idx = products.findIndex(p => String(p.id) === String(id));
+    if(idx > -1) {
+        products.splice(idx, 1);
+        renderStock(products);
+    }
+    
+    await syncBackend({ action: 'delete_product', id: id });
+    showLoader(false);
+    showToast('Produto excluído com sucesso.');
 }
 
 function renderSales(items) {

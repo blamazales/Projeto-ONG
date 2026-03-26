@@ -114,6 +114,18 @@ function doPost(e) {
            sheet.appendRow([p.id, p.nome, p.tamanho, p.cor, p.preco, p.estoque, p.foto_url]);
        }
        return success("Produto salvo");
+
+    // 4. EXCLUIR PRODUTO DO ESTOQUE
+    } else if (payload.action === "delete_product") {
+       const sheet = ss.getSheetByName(SHEET_NAME_PRODUCTS);
+       const dataP = sheet.getDataRange().getValues();
+       for(let i=1; i<dataP.length; i++) {
+           if(String(dataP[i][0]) === String(payload.id)) {
+               sheet.deleteRow(i + 1);
+               return success("Produto excluído");
+           }
+       }
+       return success("Produto não encontrado");
     }
     
   } catch (err) {

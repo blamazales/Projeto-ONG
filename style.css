@@ -69,6 +69,12 @@ h2 { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
 }
 
 .logo-container { display: flex; align-items: center; gap: 12px; }
+.custom-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    animation: fadeIn 0.5s ease;
+}
 .logo-icon-wrapper {
     background: var(--primary);
     width: 38px; height: 38px;

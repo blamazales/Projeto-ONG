@@ -4,17 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Confraria dos Miados e Latidos</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
+    <script>
+        // Força a navegação funcionar independente de falhas no carregamento de outros scripts
+        window.switchTab = function(targetId, el) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+                v.classList.add('hidden');
+            });
+            const targetView = document.getElementById(targetId);
+            targetView.classList.add('active');
+            targetView.classList.remove('hidden');
+        };
+    </script>
 </head>
 <body>
     <div id="app">
         <!-- Floating Header -->
         <header class="glass-header">
             <div class="logo-container">
-                <div class="logo-icon-wrapper">
-                    <i class="fa-solid fa-paw logo-icon"></i>
-                </div>
+                <img src="logo.png" alt="Logo da ONG" class="custom-logo">
                 <div>
                     <h1>Miados & Latidos</h1>
                     <p class="subtitle">Gestão Interna</p>
@@ -40,6 +54,7 @@
                                 <th>Item / Detalhes</th>
                                 <th>Estoque</th>
                                 <th>Preço (R$)</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="stock-table-body">
@@ -98,13 +113,13 @@
 
         <!-- Bottom Navigation Mobile -->
         <nav class="bottom-nav glass-nav">
-            <a href="#" class="nav-item active ripple-nav" data-target="view-stock">
+            <a href="javascript:void(0)" onclick="switchTab('view-stock', this)" class="nav-item active ripple-nav">
                 <i class="fa-solid fa-box-open"></i><span>Estoque</span>
             </a>
-            <a href="#" class="nav-item ripple-nav" data-target="view-history">
+            <a href="javascript:void(0)" onclick="switchTab('view-history', this)" class="nav-item ripple-nav">
                 <i class="fa-solid fa-money-bills"></i><span>Vendas</span>
             </a>
-            <a href="#" class="nav-item ripple-nav" data-target="view-config">
+            <a href="javascript:void(0)" onclick="switchTab('view-config', this)" class="nav-item ripple-nav">
                 <i class="fa-solid fa-gear"></i><span>Ajustes</span>
             </a>
         </nav>
@@ -206,6 +221,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="app.js"></script>
+    <script src="app.js?v=2"></script>
 </body>
 </html>
